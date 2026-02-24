@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autoestima · Herramienta Clínica</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f4;
+    --surface: #ffffff;
+    --surface2: #f4efe9;
+    --border: #e8ddd2;
+    --text: #2c2420;
+    --text2: #7a6a60;
+    --text3: #b0a098;
+    --accent: #8b5e52;
+    --accent2: #c4956a;
+    --accent3: #6b8c7a;
+    --accent4: #7c8fb0;
+    --low: #e8d5d0;
+    --mid: #f5e6d3;
+    --high: #d5e8dc;
+    --shadow: 0 2px 20px rgba(44,36,32,0.06);
+    --shadow2: 0 8px 40px rgba(44,36,32,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Layout */
+  .app-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    box-shadow: 2px 0 20px rgba(44,36,32,0.04);
+  }
+
+  .logo-area {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .patient-card {
+    margin: 16px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .patient-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .patient-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .patient-meta {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  .patient-edit {
+    font-size: 11px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-top: 8px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s;
+  }
+  .patient-edit:hover { text-decoration-color: var(--accent); }
+
+  .nav {
+    flex: 1;
+    padding: 12px 10px;
+    overflow-y: auto;
+  }
+
+  .nav-section {
+    margin-bottom: 20px;
+  }
+
+  .nav-section-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 12px;
+    margin-bottom: 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent); color: white; }
+  .nav-item.active .nav-icon { color: white; }
+
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .session-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .session-btn:hover { background: #7a4f44; transform: translateY(-1px); box-shadow: var(--shadow2); }
+
+  /* Main */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 1px;
+  }
+
+  .session-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .session-badge {
+    background: var(--high);
+    color: var(--accent3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .content {
+    padding: 28px 32px;
+  }
+
+  /* Panels / Sections */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* Dashboard */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-sub {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 6px;
+  }
+
+  .stat-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 10px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+
+  .stat-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* Rosenberg Scale */
+  .scale-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .scale-item:last-child { border-bottom: none; }
+
+  .scale-q {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .scale-q span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--text3);
+    margin-right: 6px;
+  }
+
+  .scale-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .scale-opt {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+
+  .scale-opt:hover { border-color: var(--accent2); color: var(--accent); }
+  .scale-opt.selected { border-color: var(--accent); background: var(--accent); color: white; }
+
+  /* Dimensions wheel area */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .dim-card {
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dim-card:hover { box-shadow: var(--shadow2); transform: translateY(-2px); }
+  .dim-card.selected { border-color: var(--accent); background: var(--surface); }
+
+  .dim-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 14px 0 0 14px;
+  }
+
+  .dim-card.d1::before { background: #c4956a; }
+  .dim-card.d2::before { background: #8b5e52; }
+  .dim-card.d3::before { background: #6b8c7a; }
+  .dim-card.d4::before { background: #7c8fb0; }
+  .dim-card.d5::before { background: #b07c8f; }
+  .dim-card.d6::before { background: #8f9e6b; }
+
+  .dim-icon { font-size: 22px; margin-bottom: 8px; margin-left: 8px; }
+  .dim-name { font-size: 13px; font-weight: 500; color: var(--text); margin-left: 8px; }
+  .dim-desc { font-size: 11px; color: var(--text2); margin-top: 4px; margin-left: 8px; line-height: 1.4; }
+
+  .dim-score {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    margin-left: 8px;
+  }
+
+  .dim-score-dots {
+    display: flex;
+    gap: 3px;
+  }
+
+  .dim-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .dim-dot.filled { background: var(--accent); }
+
+  /* Técnicas terapéuticas */
+  .technique-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .technique-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+
+  .technique-item:hover { border-color: var(--accent2); background: var(--surface); box-shadow: var(--shadow); }
+  .technique-item.active { border-color: var(--accent); background: var(--surface); }
+
+  .tech-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .tech-content { flex: 1; }
+  .tech-name { font-weight: 500; font-size: 14px; color: var(--text); margin-bottom: 3px; }
+  .tech-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
+  .tech-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    margin-top: 6px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .tech-expand {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .tech-expand.open {
+    max-height: 600px;
+  }
+
+  .tech-detail {
+    padding: 16px 0 0 0;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+
+  .tech-detail h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .tech-detail p {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .tech-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .tech-step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Notas del terapeuta */
+  .notes-area {
+    width: 100%;
+    min-height: 140px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.7;
+  }
+
+  .notes-area:focus { border-color: var(--accent); background: var(--surface); }
+  .notes-area::placeholder { color: var(--text3); font-style: italic; }
+
+  /* Timeline sesiones */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 6px; bottom: 0;
+    width: 1.5px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    position: relative;
+    padding-bottom: 24px;
+  }
+
+  .tl-dot {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid var(--accent);
+    background: var(--surface);
+  }
+
+  .tl-dot.filled { background: var(--accent); }
+
+  .tl-date {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .tl-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .tl-note {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .tl-score {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 6px;
+  }
+
+  /* Ejercicios */
+  .exercise-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+  }
+
+  .exercise-card:hover { transform: translateY(-2px); box-shadow: var(--shadow2); }
+
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .exercise-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .exercise-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .exercise-type {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 1px;
+  }
+
+  .exercise-body {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .exercise-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .exercise-q {
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .exercise-q:hover { background: var(--border); }
+
+  .exercise-q-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    margin-top: 8px;
+    outline: none;
+    resize: none;
+    min-height: 60px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .exercise-q.open .exercise-q-input { display: block; }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { background: #7a4f44; transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+  }
+
+  .btn-outline:hover { background: var(--accent); color: white; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  .flex { display: flex; }
+  .gap-10 { gap: 10px; }
+  .gap-20 { gap: 20px; }
+  .mb-20 { margin-bottom: 20px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-12 { margin-bottom: 12px; }
+  .flex-end { justify-content: flex-end; }
+  .items-center { align-items: center; }
+  .between { justify-content: space-between; }
+
+  /* Profile modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(44,36,32,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 32px;
+    width: 480px;
+    max-width: 95vw;
+    box-shadow: var(--shadow2);
+    animation: modalIn 0.25s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 6px;
+    display: block;
+    letter-spacing: 0.04em;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus, .form-select:focus { border-color: var(--accent); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Radar Chart placeholder */
+  .radar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+  }
+
+  canvas {
+    max-width: 100%;
+  }
+
+  /* Chips */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    gap: 5px;
+  }
+
+  .chip-green { background: var(--high); color: var(--accent3); }
+  .chip-amber { background: var(--mid); color: #9c6e30; }
+  .chip-red { background: var(--low); color: #8b3e30; }
+  .chip-blue { background: #dde5f5; color: #4a5e8a; }
+
+  /* Separator */
+  .sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* Page fade-in */
+  .section.active { animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+
+  /* Progress ring */
+  .ring-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100px;
+    height: 100px;
+  }
+
+  .ring-label {
+    position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Highlighted quote */
+  .quote-block {
+    border-left: 3px solid var(--accent2);
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-radius: 0 10px 10px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-style: italic;
+    color: var(--text2);
+    line-height: 1.6;
+    margin: 14px 0;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+
+  .tab {
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1.5px;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Responsive hint */
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .dim-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 700px) {
+    .sidebar { transform: translateX(-260px); }
+    .main { margin-left: 0; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .dim-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Autocomplete note */
+  .info-box {
+    background: linear-gradient(135deg, #f0ebe6, #f9f4ef);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .info-box .icon { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+
+  /* Score gradient display */
+  .score-gauge {
+    margin: 14px 0;
+  }
+
+  .score-gauge-track {
+    height: 10px;
+    background: linear-gradient(to right, var(--low), #f5e6d3, var(--high));
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .score-gauge-thumb {
+    position: absolute;
+    top: -4px;
+    width: 18px; height: 18px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transform: translateX(-50%);
+    transition: left 0.8s cubic-bezier(.4,0,.2,1);
+  }
+
+  .score-gauge-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  /* Alert */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .alert-warn { background: #fef3e2; color: #7c5500; border: 1px solid #f5d98a; }
+  .alert-info { background: #e8f0fe; color: #2a4a7f; border: 1px solid #b3c8f7; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-title">Espacio Interior</div>
+      <div class="logo-sub">Herramienta clínica · Autoestima</div>
+    </div>
+
+    <div class="patient-card">
+      <div class="patient-label">Paciente activo</div>
+      <div class="patient-name" id="sb-patient-name">María González</div>
+      <div class="patient-meta" id="sb-patient-meta">42 años · Sesión #7</div>
+      <div class="patient-edit" onclick="openModal()">✎ Editar perfil</div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Evaluación</div>
+        <div class="nav-item active" onclick="showSection('dashboard')">
+          <span class="nav-icon">◈</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="showSection('escala')">
+          <span class="nav-icon">⊙</span> Escala Rosenberg
+        </div>
+        <div class="nav-item" onclick="showSection('dimensiones')">
+          <span class="nav-icon">❋</span> Dimensiones
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Intervención</div>
+        <div class="nav-item" onclick="showSection('tecnicas')">
+          <span class="nav-icon">⟡</span> Técnicas
+        </div>
+        <div class="nav-item" onclick="showSection('ejercicios')">
+          <span class="nav-icon">◎</span> Ejercicios
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Seguimiento</div>
+        <div class="nav-item" onclick="showSection('notas')">
+          <span class="nav-icon">✦</span> Notas clínicas
+        </div>
+        <div class="nav-item" onclick="showSection('historial')">
+          <span class="nav-icon">↻</span> Historial
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="session-btn" onclick="newSession()">+ Nueva sesión</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="page-subtitle" id="page-subtitle">Resumen clínico · Autoestima</div>
+      </div>
+      <div class="session-info">
+        <span id="session-date"></span>
+        <span class="session-badge">Sesión activa</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section class="section active" id="s-dashboard">
+        <div class="alert alert-info">
+          <span>ℹ</span>
+          <span>Herramienta de apoyo clínico. Los datos se guardan localmente durante la sesión. Complete el perfil del paciente antes de comenzar la evaluación.</span>
+        </div>
+
+        <div class="grid-3 mb-20" id="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Puntaje Rosenberg</div>
+            <div class="stat-value" id="d-rosenberg">—</div>
+            <div class="stat-sub" id="d-rosenberg-label">Sin evaluar</div>
+            <div class="stat-bar"><div class="stat-bar-fill" id="d-rosenberg-bar" style="width:0%;background:var(--accent)"></div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Área de mayor fortaleza</div>
+            <div class="stat-value" style="font-size:28px" id="d-strength">—</div>
+            <div class="stat-sub" id="d-strength-sub">Completar dimensiones</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Área de mayor dificultad</div>
+            <div class="stat-value" style="font-size:28px" id="d-weakness">—</div>
+            <div class="stat-sub" id="d-weakness-sub">Completar dimensiones</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-20">
+          <div class="card">
+            <div class="card-title">Perfil de autoestima</div>
+            <div class="card-desc">Radar multidimensional basado en los resultados de la evaluación de dimensiones.</div>
+            <div class="radar-wrap">
+              <canvas id="radar-canvas" width="280" height="280"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Guía de interpretación</div>
+            <div class="card-desc">Escala de Rosenberg: 0–10 baja, 11–25 media, 26–30 alta autoestima.</div>
+            <div class="score-gauge">
+              <div class="score-gauge-track">
+                <div class="score-gauge-thumb" id="gauge-thumb" style="left:0%"></div>
+              </div>
+              <div class="score-gauge-labels">
+                <span>Baja (0–10)</span>
+                <span>Media (11–25)</span>
+                <span>Alta (26–30)</span>
+              </div>
+            </div>
+            <div class="sep"></div>
+            <div class="card-title" style="font-size:17px;margin-bottom:10px">Señales de alerta clínica</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.8">
+              ⚠ Autocrítica intensa y generalizada<br>
+              ⚠ Dificultad para recibir reconocimiento<br>
+              ⚠ Comparación constante con otros<br>
+              ⚠ Creencias de inutilidad o insuficiencia<br>
+              ⚠ Evitación de desafíos por miedo al fracaso
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Prioridades terapéuticas sugeridas</div>
+          <div class="card-desc">Basadas en el perfil actual. Actualiza las evaluaciones para refinar estas recomendaciones.</div>
+          <div class="grid-3" id="priorities-grid">
+            <div class="exercise-card" style="cursor:default">
+              <div class="exercise-header">
+                <div class="exercise-icon" style="background:#f0ebe6;font-size:22px">💬</div>
+                <div>
+                  <div class="exercise-name" style="font-size:16px">Reestructuración cognitiva</div>
+                  <div class="exercise-type">Pensamiento automático negativo</div>
+                </div>
+              </div>
+              <div class="exercise-body">Identificar y cuestionar creencias nucleares sobre el valor propio. Registrar evidencia a favor y en contra.</div>
+            </div>
+            <div class="exercise-card" style="cursor:default">
+              <div class="exercise-header">
+                <div class="exercise-icon" style="background:#f0ebe6;font-size:22px">🌱</div>
+                <div>
+                  <div class="exercise-name" style="font-size:16px">Autocompasión activa</div>
+                  <div class="exercise-type">Mindful self-compassion</div>
+                </div>
+              </div>
+              <div class="exercise-body">Desarrollar una voz interna más amable. Reducir la autocrítica excesiva y el perfeccionismo.</div>
+            </div>
+            <div class="exercise-card" style="cursor:default">
+              <div class="exercise-header">
+                <div class="exercise-icon" style="background:#f0ebe6;font-size:22px">🏛</div>
+                <div>
+                  <div class="exercise-name" style="font-size:16px">Valores e identidad</div>
+                  <div class="exercise-type">ACT - Valores personales</div>
+                </div>
+              </div>
+              <div class="exercise-body">Clarificar valores propios y fortalecer la identidad adulta más allá de roles sociales o laborales.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ESCALA ROSENBERG -->
+      <section class="section" id="s-escala">
+        <div class="card mb-20">
+          <div class="card-title">Escala de Autoestima de Rosenberg</div>
+          <div class="card-desc">Instrumento validado. 10 ítems. Puntuación: 1 (Muy en desacuerdo) — 4 (Muy de acuerdo). Ítems invertidos: 3, 5, 8, 9, 10. Puntaje total: 10–40. Adaptado al rango 0–30.</div>
+
+          <div class="info-box mb-20">
+            <span class="icon">📋</span>
+            <span>Instrucción para el paciente: <em>"A continuación hay una lista de afirmaciones sobre tus sentimientos respecto a ti mismo/a. Indica cuánto acuerdo tienes con cada una."</em></span>
+          </div>
+
+          <div id="rosenberg-items"></div>
+
+          <div class="sep"></div>
+          <div class="flex between items-center">
+            <div>
+              <div style="font-size:13px;color:var(--text2)">Puntaje total</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--accent)" id="rosenberg-total">—</div>
+              <div id="rosenberg-interp" style="font-size:13px;color:var(--text2);margin-top:2px"></div>
+            </div>
+            <button class="btn btn-primary" onclick="calcRosenberg()">Calcular puntaje</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DIMENSIONES -->
+      <section class="section" id="s-dimensiones">
+        <div class="mb-20">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:6px">Dimensiones de la autoestima</div>
+          <div style="font-size:13px;color:var(--text2)">Evalúa cada dimensión para obtener un perfil integral. Haz clic en una dimensión para explorarla.</div>
+        </div>
+
+        <div class="dim-grid mb-20" id="dim-grid"></div>
+
+        <div class="card" id="dim-detail-card" style="display:none">
+          <div id="dim-detail-content"></div>
+        </div>
+      </section>
+
+      <!-- TÉCNICAS -->
+      <section class="section" id="s-tecnicas">
+        <div class="mb-20" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)">Técnicas terapéuticas</div>
+
+        <div class="grid-2">
+          <div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;letter-spacing:0.08em;text-transform:uppercase">Enfoque Cognitivo-Conductual</div>
+            <div class="technique-list" id="tech-cbt"></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;letter-spacing:0.08em;text-transform:uppercase">Enfoques de Tercera Generación</div>
+            <div class="technique-list" id="tech-3gen"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EJERCICIOS -->
+      <section class="section" id="s-ejercicios">
+        <div class="mb-20 flex between items-center">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)">Ejercicios en sesión</div>
+          <div class="tabs" style="margin-bottom:0;border:none">
+            <div class="tab active" onclick="filterEx('all',this)">Todos</div>
+            <div class="tab" onclick="filterEx('cognitivo',this)">Cognitivo</div>
+            <div class="tab" onclick="filterEx('emocional',this)">Emocional</div>
+            <div class="tab" onclick="filterEx('conductual',this)">Conductual</div>
+          </div>
+        </div>
+        <div class="grid-2" id="exercises-grid"></div>
+      </section>
+
+      <!-- NOTAS CLÍNICAS -->
+      <section class="section" id="s-notas">
+        <div class="grid-2">
+          <div>
+            <div class="card mb-20">
+              <div class="card-title">Notas de sesión</div>
+              <div class="card-desc">Registra observaciones clínicas, hipótesis y acuerdos terapéuticos.</div>
+              <textarea class="notes-area mb-12" id="notes-session" placeholder="Observaciones de la sesión actual..."></textarea>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:6px;margin-top:4px">Estado emocional observado</div>
+              <div class="flex gap-10 mb-12" id="emotion-tags">
+                <span class="chip chip-blue" style="cursor:pointer" onclick="toggleEmotionTag(this)">Ansioso/a</span>
+                <span class="chip chip-blue" style="cursor:pointer" onclick="toggleEmotionTag(this)">Defensivo/a</span>
+                <span class="chip chip-blue" style="cursor:pointer" onclick="toggleEmotionTag(this)">Abierto/a</span>
+                <span class="chip chip-blue" style="cursor:pointer" onclick="toggleEmotionTag(this)">Triste</span>
+              </div>
+              <button class="btn btn-primary" onclick="saveNote()">Guardar nota</button>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Hipótesis clínica</div>
+              <div class="card-desc">Formulación actual del caso en términos de autoestima.</div>
+              <textarea class="notes-area mb-12" id="notes-hypothesis" placeholder="Factores de mantenimiento, creencias nucleares identificadas, historia vincular relevante..."></textarea>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-20">
+              <div class="card-title">Objetivos terapéuticos</div>
+              <div id="goals-list" style="margin-bottom:14px"></div>
+              <div class="flex gap-10">
+                <input class="form-input" id="new-goal" placeholder="Nuevo objetivo..." style="flex:1">
+                <button class="btn btn-outline" onclick="addGoal()">Añadir</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Tarea entre sesiones</div>
+              <div class="card-desc">Actividades acordadas con el paciente para realizar fuera de consulta.</div>
+              <textarea class="notes-area" id="notes-homework" placeholder="Tarea acordada para la próxima semana..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTORIAL -->
+      <section class="section" id="s-historial">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Historial de sesiones</div>
+            <div class="card-desc">Registro cronológico del proceso terapéutico.</div>
+            <div class="timeline" id="timeline"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Evolución del puntaje Rosenberg</div>
+            <div class="card-desc">Seguimiento de la autoestima a lo largo del proceso.</div>
+            <canvas id="evolution-chart" width="350" height="200" style="max-width:100%"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app-shell -->
+
+<!-- MODAL PACIENTE -->
+<div class="modal-overlay" id="patient-modal">
+  <div class="modal">
+    <div class="modal-title">Perfil del paciente</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input class="form-input" id="f-name" placeholder="Nombre">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Apellido</label>
+        <input class="form-input" id="f-last" placeholder="Apellido">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Edad</label>
+        <input class="form-input" id="f-age" type="number" placeholder="Ej: 38" min="30" max="50">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Género</label>
+        <select class="form-select" id="f-gender">
+          <option value="">Seleccionar</option>
+          <option>Mujer</option>
+          <option>Hombre</option>
+          <option>No binario</option>
+          <option>Prefiere no decir</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">N° de sesión</label>
+        <input class="form-input" id="f-session" type="number" placeholder="Ej: 7" min="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motivo de consulta</label>
+        <input class="form-input" id="f-reason" placeholder="Ej: baja autoestima laboral">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Antecedentes relevantes</label>
+      <textarea class="form-input" rows="3" id="f-notes" placeholder="Historial clínico relevante..." style="resize:vertical;min-height:70px;font-family:'DM Sans',sans-serif;font-size:13px"></textarea>
+    </div>
+    <div class="flex gap-10 flex-end" style="margin-top:20px">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePatient()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const rosenbergItems = [
+  { id:1, text:"Siento que soy una persona digna de aprecio, al menos en igual medida que los demás.", reversed:false },
+  { id:2, text:"Estoy convencido/a de que tengo buenas cualidades.", reversed:false },
+  { id:3, text:"Soy capaz de hacer las cosas tan bien como la mayoría de la gente.", reversed:false },
+  { id:4, text:"Tengo una actitud positiva hacia mí mismo/a.", reversed:false },
+  { id:5, text:"En general estoy satisfecho/a de mí mismo/a.", reversed:false },
+  { id:6, text:"Siento que no tengo mucho de lo que estar orgulloso/a.", reversed:true },
+  { id:7, text:"En general, me inclino a pensar que soy un fracasado/a.", reversed:true },
+  { id:8, text:"Me gustaría poder sentir más respeto por mí mismo/a.", reversed:true },
+  { id:9, text:"Hay veces que realmente pienso que soy un inútil.", reversed:true },
+  { id:10, text:"A veces creo que no soy buena persona.", reversed:true }
+];
+
+const dimensions = [
+  { id:'d1', name:'Autovaloración', icon:'💎', desc:'Cómo se percibe su valor como persona', class:'d1',
+    questions:['¿Cómo te describirías a ti mismo/a como persona?','¿Qué cualidades positivas reconoces en ti?','¿Sientes que mereces cosas buenas en tu vida?','¿Cómo reaccionas cuando recibes un elogio?'],
+    level: 0 },
+  { id:'d2', name:'Autoaceptación', icon:'🌸', desc:'Capacidad de aceptarse con fortalezas y limitaciones', class:'d2',
+    questions:['¿Qué aspectos de ti mismo/a te cuesta aceptar?','¿Cómo te tratas cuando cometes un error?','¿Sientes que debes ser perfecto/a para ser valioso/a?','¿Puedes hablar de tus debilidades sin vergüenza excesiva?'],
+    level: 0 },
+  { id:'d3', name:'Autoeficacia', icon:'⚡', desc:'Confianza en sus capacidades y habilidades', class:'d3',
+    questions:['¿Confías en tu capacidad para resolver problemas?','¿Cómo afrontas situaciones nuevas o retadoras?','¿Con qué frecuencia te sientes competente en tu trabajo/vida?','¿El miedo al fracaso te impide intentar cosas nuevas?'],
+    level: 0 },
+  { id:'d4', name:'Autoimagen', icon:'🪞', desc:'Percepción de sí mismo/a en lo físico y social', class:'d4',
+    questions:['¿Cómo te sientes respecto a tu imagen corporal?','¿Te importa mucho la opinión de los demás sobre ti?','¿Cómo te ves en las relaciones sociales?','¿Hay aspectos físicos de ti que te generen vergüenza?'],
+    level: 0 },
+  { id:'d5', name:'Autorrealización', icon:'🌟', desc:'Sentido de propósito y logros personales', class:'d5',
+    questions:['¿Sientes que tu vida tiene un sentido claro?','¿Qué logros te generan orgullo genuino?','¿Estás donde esperabas estar a esta etapa de tu vida?','¿Tienes metas que te motivan activamente?'],
+    level: 0 },
+  { id:'d6', name:'Identidad adulta', icon:'🏛', desc:'Claridad sobre quién es como adulto/a', class:'d6',
+    questions:['¿Cómo definirías tu identidad más allá de tus roles (trabajo, familia)?','¿Qué valores guían tu vida en este momento?','¿Sientes continuidad entre quien eras joven y quien eres hoy?','¿Hay partes de ti que sientes que has perdido con los años?'],
+    level: 0 },
+];
+
+const techniquesCBT = [
+  { name:'Registro de pensamientos automáticos', icon:'📝', color:'#fdf0e8',
+    tag:'TCC', tagColor:'chip-amber',
+    desc:'Identifica situaciones activadoras, pensamientos automáticos, emociones y respuestas.',
+    steps:['Pedir al paciente que describa una situación reciente donde sintió baja autoestima.','Identificar el pensamiento automático específico ("Soy un fracaso", "No sirvo").','Explorar la emoción asociada y su intensidad (0-100).','Buscar distorsiones cognitivas: sobregeneralización, catastrofismo, etc.','Generar un pensamiento alternativo más equilibrado y evaluar la creencia (0-100).']
+  },
+  { name:'Evidencia a favor y en contra', icon:'⚖️', color:'#eef2ff',
+    tag:'TCC', tagColor:'chip-blue',
+    desc:'Evalúa la validez real de las creencias negativas sobre uno mismo.',
+    steps:['Escribir la creencia central a examinar (ej: "Soy inadecuado/a").','Listar evidencias que el paciente siente que apoyan esta creencia.','Buscar activamente evidencias que la contradigan o matizan.','Evaluar la creencia original con la nueva perspectiva.','Formular una creencia alternativa más justa.']
+  },
+  { name:'Experimento conductual', icon:'🔬', color:'#e8f5ee',
+    tag:'TCC', tagColor:'chip-green',
+    desc:'Probar en la vida real si las predicciones catastrofistas son verdaderas.',
+    steps:['Identificar una predicción basada en baja autoestima (ej: "Si hablo en la reunión me ridiculizaré").','Diseñar un experimento pequeño y manejable.','Ejecutarlo como tarea entre sesiones.','Registrar qué ocurrió realmente vs. la predicción.','Sacar conclusiones sobre las capacidades propias.']
+  },
+];
+
+const techniquesThirdGen = [
+  { name:'Defusión cognitiva (ACT)', icon:'☁️', color:'#f5eef8',
+    tag:'ACT', tagColor:'chip-blue',
+    desc:'Crear distancia psicológica entre el paciente y sus pensamientos sobre sí mismo.',
+    steps:['Identificar un pensamiento doloroso de autoestima ("Soy un/a perdedor/a").','Practicar la defusión: "Estoy teniendo el pensamiento de que soy un/a perdedor/a".','Explorar: ¿Este pensamiento es un hecho o solo un pensamiento?','Ejercicio: Imaginar el pensamiento como nubes que pasan.','Preguntar: ¿Qué harías si no creyeras completamente este pensamiento?']
+  },
+  { name:'Autocompasión (MSC)', icon:'💗', color:'#fde8f0',
+    tag:'Mindful', tagColor:'chip-red',
+    desc:'Desarrollar una relación más amable y compasiva con uno mismo.',
+    steps:['Guiar al paciente a identificar un momento de sufrimiento relacionado a la autoestima.','Nombrar el sufrimiento: "Esto me duele. Estoy sufriendo."','Recordar la humanidad compartida: "No estoy solo/a en esto."','Practicar la bondad hacia uno mismo: ¿Qué le dirías a un amigo en tu lugar?','Formular una frase de autocompasión personalizada.']
+  },
+  { name:'Narrativa del self compasivo', icon:'✍️', color:'#fef9e8',
+    tag:'CFT', tagColor:'chip-amber',
+    desc:'Reescribir la historia personal desde una perspectiva más compasiva.',
+    steps:['Explorar la narrativa actual que el paciente tiene sobre sí mismo.','Identificar el origen de las creencias limitantes (experiencias tempranas, crítica parental).','Reconocer que estas creencias no son hechos sino historias aprendidas.','Escribir una versión alternativa de la historia desde la comprensión y la compasión.','Compartir y procesar la nueva narrativa en sesión.']
+  },
+];
+
+const exercises = [
+  { name:'Carta a tu yo crítico', icon:'✉️', bg:'#fdf0e8', type:'emocional',
+    desc:'El paciente escribe una carta dirigida a su voz autocrítica interna, reconociéndola pero no obedeciendo sus mandatos.',
+    qs:['¿Qué palabras usa tu crítico interno más frecuentemente?','¿Desde cuándo escuchas esa voz?','¿Qué crees que trata de protegerte haciendo esta crítica?','¿Qué le dirías a esa voz si pudieras?']
+  },
+  { name:'Registro de logros diarios', icon:'✅', bg:'#e8f5ee', type:'conductual',
+    desc:'Durante 7 días, registrar al menos 3 logros o acciones positivas al día, sin importar su tamaño.',
+    qs:['¿Cuál es la primera reacción ante este ejercicio?','¿Hay resistencia a reconocer logros propios?','¿Qué dice eso sobre cómo te relacionas con tu valor propio?']
+  },
+  { name:'El amigo compasivo', icon:'🤝', bg:'#f5eef8', type:'emocional',
+    desc:'Imaginar qué le dirías a un amigo querido que tiene el mismo problema que tú. Luego aplicarlo a uno mismo.',
+    qs:['¿Cuáles serían tus palabras para ese amigo?','¿Por qué te resulta más fácil ser amable con otros que contigo?','¿Qué cambiaría si te hablaras como a ese amigo?']
+  },
+  { name:'Tabla de valores propios', icon:'🗝️', bg:'#eef2ff', type:'cognitivo',
+    desc:'Identificar los valores que realmente guían la vida del paciente, diferenciándolos de los valores impuestos externamente.',
+    qs:['¿Cuáles son los 5 valores más importantes en tu vida?','¿Cuáles de estos elegiste tú y cuáles te fueron dados?','¿Tu vida actual refleja estos valores?','¿Qué pequeño cambio podrías hacer para vivir más alineado/a con ellos?']
+  },
+  { name:'Línea de vida', icon:'📍', bg:'#fde8f0', type:'cognitivo',
+    desc:'Trazar una línea de tiempo con eventos significativos, explorando cómo se construyó la autoestima a lo largo de la vida.',
+    qs:['¿Cuándo recuerdas haberte sentido muy seguro/a de ti mismo/a?','¿Hubo eventos que marcaron un quiebre en tu autoestima?','¿Qué has superado que no te has dado suficiente crédito?','¿Qué le dirías a tu yo de 20 años?']
+  },
+  { name:'Mapa de fortalezas', icon:'💪', bg:'#e8f5ee', type:'conductual',
+    desc:'Explorar y mapear fortalezas personales desde diferentes perspectivas: la propia, la de personas cercanas, la histórica.',
+    qs:['¿Qué crees que los demás aprecian de ti?','¿Qué habilidades has desarrollado con esfuerzo?','¿Qué fortalezas reconoces ahora que antes no veías?','¿Cómo podrías usar más estas fortalezas en tu vida?']
+  },
+];
+
+// ===== STATE =====
+let state = {
+  patient: { name:'María González', age:42, session:7 },
+  rosenbergAnswers: {},
+  dimLevels: {},
+  notes: [],
+  goals: ['Reducir autocrítica en el contexto laboral','Fortalecer la autoimagen corporal'],
+  activeSection: 'dashboard'
+};
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('session-date').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  renderRosenberg();
+  renderDimensions();
+  renderTechniques();
+  renderExercises();
+  renderTimeline();
+  renderGoals();
+  drawRadar([3,2,4,3,2,3]);
+  drawEvolution();
+  setTimeout(() => updateGauge(0), 300);
+});
+
+// ===== NAV =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  const titles = {
+    dashboard: ['Dashboard','Resumen clínico · Autoestima'],
+    escala: ['Escala Rosenberg','Instrumento de evaluación validado'],
+    dimensiones: ['Dimensiones de autoestima','Exploración multidimensional'],
+    tecnicas: ['Técnicas terapéuticas','Protocolos de intervención'],
+    ejercicios: ['Ejercicios en sesión','Actividades estructuradas'],
+    notas: ['Notas clínicas','Registro de sesión'],
+    historial: ['Historial','Seguimiento del proceso terapéutico'],
+  };
+  document.getElementById('page-title').textContent = titles[id][0];
+  document.getElementById('page-subtitle').textContent = titles[id][1];
+}
+
+// ===== ROSENBERG =====
+function renderRosenberg() {
+  const container = document.getElementById('rosenberg-items');
+  container.innerHTML = rosenbergItems.map((item,i) => `
+    <div class="scale-item">
+      <div class="scale-q"><span>${i+1}.</span>${item.text}${item.reversed ? ' <em style="color:var(--text3);font-size:11px">(invertida)</em>' : ''}</div>
+      <div class="scale-options">
+        ${['Muy en desacuerdo','En desacuerdo','De acuerdo','Muy de acuerdo'].map((opt,j) => `
+          <div class="scale-opt" onclick="selectRosenberg(${item.id},${j+1},this)">${opt}</div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectRosenberg(itemId, val, el) {
+  el.closest('.scale-options').querySelectorAll('.scale-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.rosenbergAnswers[itemId] = val;
+}
+
+function calcRosenberg() {
+  const answers = state.rosenbergAnswers;
+  if (Object.keys(answers).length < 10) {
+    alert('Por favor responde todos los ítems antes de calcular.');
+    return;
+  }
+  let total = 0;
+  rosenbergItems.forEach(item => {
+    let val = answers[item.id];
+    if (item.reversed) val = 5 - val;
+    total += val;
+  });
+  // Normalize to 0-30
+  const score = total - 10;
+  document.getElementById('rosenberg-total').textContent = score;
+  let interp = score <= 10 ? 'Autoestima baja' : score <= 25 ? 'Autoestima media' : 'Autoestima alta';
+  document.getElementById('rosenberg-interp').textContent = interp;
+  // Update dashboard
+  document.getElementById('d-rosenberg').textContent = score;
+  document.getElementById('d-rosenberg-label').textContent = interp;
+  document.getElementById('d-rosenberg-bar').style.width = (score/30*100) + '%';
+  updateGauge(score/30*100);
+}
+
+function updateGauge(pct) {
+  document.getElementById('gauge-thumb').style.left = Math.max(2, Math.min(98, pct)) + '%';
+}
+
+// ===== DIMENSIONS =====
+function renderDimensions() {
+  const grid = document.getElementById('dim-grid');
+  grid.innerHTML = dimensions.map(d => `
+    <div class="dim-card ${d.class}" id="dc-${d.id}" onclick="showDimension('${d.id}')">
+      <div class="dim-icon">${d.icon}</div>
+      <div class="dim-name">${d.name}</div>
+      <div class="dim-desc">${d.desc}</div>
+      <div class="dim-score">
+        <div class="dim-score-dots" id="dots-${d.id}">
+          ${[1,2,3,4,5].map(n => `<div class="dim-dot" id="dot-${d.id}-${n}"></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let activeDim = null;
+
+function showDimension(id) {
+  document.querySelectorAll('.dim-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('dc-' + id).classList.add('selected');
+  activeDim = id;
+  const dim = dimensions.find(d => d.id === id);
+  const card = document.getElementById('dim-detail-card');
+  card.style.display = 'block';
+  document.getElementById('dim-detail-content').innerHTML = `
+    <div class="flex between items-center mb-16">
+      <div>
+        <div class="card-title">${dim.icon} ${dim.name}</div>
+        <div class="card-desc">${dim.desc}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;text-align:center">Nivel explorado</div>
+        <div class="flex gap-10" style="justify-content:center">
+          ${[1,2,3,4,5].map(n => `<div style="width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;background:${(state.dimLevels[id]||0)>=n?'var(--accent)':'transparent'};color:${(state.dimLevels[id]||0)>=n?'white':'var(--accent)'}" onclick="setDimLevel('${id}',${n})">${n}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="quote-block">Preguntas de exploración clínica sugeridas para esta dimensión</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      ${dim.questions.map((q,i) => `
+        <div style="padding:12px 16px;background:var(--surface2);border-radius:10px;border-left:3px solid var(--accent2)">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Pregunta ${i+1}</div>
+          <div style="font-size:14px;color:var(--text);line-height:1.5">${q}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Observaciones del terapeuta para esta dimensión</div>
+    <textarea class="notes-area" id="notes-dim-${id}" placeholder="Notas sobre ${dim.name.toLowerCase()}..." style="min-height:100px"></textarea>
+  `;
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function setDimLevel(id, level) {
+  state.dimLevels[id] = level;
+  [1,2,3,4,5].forEach(n => {
+    const dot = document.getElementById(`dot-${id}-${n}`);
+    if (dot) dot.classList.toggle('filled', n <= level);
+  });
+  showDimension(id);
+  updateDashboardDims();
+}
+
+function updateDashboardDims() {
+  const dimData = dimensions.map(d => ({...d, level: state.dimLevels[d.id] || 0}));
+  const withLevel = dimData.filter(d => d.level > 0);
+  if (withLevel.length === 0) return;
+  const best = withLevel.reduce((a,b) => a.level>b.level?a:b);
+  const worst = withLevel.reduce((a,b) => a.level<b.level?a:b);
+  document.getElementById('d-strength').textContent = best.icon;
+  document.getElementById('d-strength-sub').textContent = best.name;
+  document.getElementById('d-weakness').textContent = worst.icon;
+  document.getElementById('d-weakness-sub').textContent = worst.name;
+  const levels = dimensions.map(d => state.dimLevels[d.id] || 2);
+  drawRadar(levels);
+}
+
+// ===== RADAR CHART =====
+function drawRadar(values) {
+  const canvas = document.getElementById('radar-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+  const R = Math.min(W,H)/2 - 30;
+  const n = 6;
+  const labels = ['Autovaloración','Autoaceptación','Autoeficacia','Autoimagen','Autorrealización','Identidad'];
+  const max = 5;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid
+  for (let ring = 1; ring <= 5; ring++) {
+    const r = R * ring / max;
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const angle = (i/n) * Math.PI * 2 - Math.PI/2;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = '#e8ddd2';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Axes
+  for (let i = 0; i < n; i++) {
+    const angle = (i/n) * Math.PI * 2 - Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+    ctx.strokeStyle = '#d0c4bb';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Data
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const angle = (i/n) * Math.PI * 2 - Math.PI/2;
+    const r = R * (values[i] || 1) / max;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(139,94,82,0.15)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(139,94,82,0.8)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Dots
+  for (let i = 0; i < n; i++) {
+    const angle = (i/n) * Math.PI * 2 - Math.PI/2;
+    const r = R * (values[i] || 1) / max;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    ctx.beginPath();
+    ctx.arc(x,y,5,0,Math.PI*2);
+    ctx.fillStyle = 'var(--accent)';
+    ctx.fill();
+  }
+
+  // Labels
+  ctx.fillStyle = '#7a6a60';
+  ctx.font = '12px DM Sans';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < n; i++) {
+    const angle = (i/n) * Math.PI * 2 - Math.PI/2;
+    const r = R + 22;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    const words = labels[i].split(' ');
+    if (words.length > 1) {
+      ctx.fillText(words[0], x, y-7);
+      ctx.fillText(words.slice(1).join(' '), x, y+7);
+    } else {
+      ctx.fillText(labels[i], x, y);
+    }
+  }
+}
+
+// ===== EVOLUTION CHART =====
+function drawEvolution() {
+  const canvas = document.getElementById('evolution-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const data = [8,12,15,14,18,20,22];
+  const sessions = ['S1','S2','S3','S4','S5','S6','S7'];
+  const pad = {t:20,r:20,b:40,l:40};
+  const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid
+  [0,10,20,30].forEach(v => {
+    const y = pad.t + ch - (v/30*ch);
+    ctx.beginPath();
+    ctx.moveTo(pad.l,y);
+    ctx.lineTo(pad.l+cw,y);
+    ctx.strokeStyle = '#e8ddd2';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#b0a098';
+    ctx.font = '10px DM Sans';
+    ctx.textAlign = 'right';
+    ctx.fillText(v, pad.l-6, y+3);
+  });
+
+  // Line
+  ctx.beginPath();
+  data.forEach((v,i) => {
+    const x = pad.l + (i/(data.length-1))*cw;
+    const y = pad.t + ch - (v/30*ch);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = 'rgba(139,94,82,0.9)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Area
+  ctx.beginPath();
+  data.forEach((v,i) => {
+    const x = pad.l + (i/(data.length-1))*cw;
+    const y = pad.t + ch - (v/30*ch);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.lineTo(pad.l+cw, pad.t+ch);
+  ctx.lineTo(pad.l, pad.t+ch);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(139,94,82,0.08)';
+  ctx.fill();
+
+  // Dots + Labels
+  data.forEach((v,i) => {
+    const x = pad.l + (i/(data.length-1))*cw;
+    const y = pad.t + ch - (v/30*ch);
+    ctx.beginPath();
+    ctx.arc(x,y,5,0,Math.PI*2);
+    ctx.fillStyle = '#8b5e52';
+    ctx.fill();
+    ctx.fillStyle = '#7a6a60';
+    ctx.font = '10px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText(sessions[i], x, pad.t+ch+16);
+    ctx.fillStyle = '#2c2420';
+    ctx.font = 'bold 10px DM Sans';
+    ctx.fillText(v, x, y-10);
+  });
+}
+
+// ===== TECHNIQUES =====
+function renderTechniques() {
+  renderTechList('tech-cbt', techniquesCBT);
+  renderTechList('tech-3gen', techniquesThirdGen);
+}
+
+function renderTechList(containerId, list) {
+  document.getElementById(containerId).innerHTML = list.map((t,i) => `
+    <div class="technique-item" onclick="toggleTech(this)">
+      <div class="tech-icon" style="background:${t.color}">${t.icon}</div>
+      <div class="tech-content">
+        <div class="tech-name">${t.name}</div>
+        <div class="tech-desc">${t.desc}</div>
+        <span class="chip ${t.tagColor} tech-tag">${t.tag}</span>
+        <div class="tech-expand">
+          <div class="tech-detail">
+            <h4>Protocolo paso a paso</h4>
+            ${t.steps.map((s,j) => `
+              <div class="tech-step">
+                <div class="tech-step-num">${j+1}</div>
+                <div>${s}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTech(el) {
+  const expand = el.querySelector('.tech-expand');
+  const isOpen = expand.classList.contains('open');
+  document.querySelectorAll('.tech-expand').forEach(e => e.classList.remove('open'));
+  document.querySelectorAll('.technique-item').forEach(e => e.classList.remove('active'));
+  if (!isOpen) {
+    expand.classList.add('open');
+    el.classList.add('active');
+  }
+}
+
+// ===== EXERCISES =====
+function renderExercises(filter='all') {
+  const grid = document.getElementById('exercises-grid');
+  const filtered = filter === 'all' ? exercises : exercises.filter(e => e.type === filter);
+  grid.innerHTML = filtered.map((ex,i) => `
+    <div class="exercise-card" data-type="${ex.type}">
+      <div class="exercise-header">
+        <div class="exercise-icon" style="background:${ex.bg}">${ex.icon}</div>
+        <div>
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-type">${ex.type.charAt(0).toUpperCase()+ex.type.slice(1)}</div>
+        </div>
+      </div>
+      <div class="exercise-body">${ex.desc}</div>
+      <div class="exercise-questions">
+        ${ex.qs.map((q,j) => `
+          <div class="exercise-q" onclick="toggleExQ(this)">
+            <div>${q}</div>
+            <textarea class="exercise-q-input" placeholder="Respuesta / observación del paciente..."></textarea>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterEx(type, el) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderExercises(type);
+}
+
+function toggleExQ(el) {
+  const wasOpen = el.classList.contains('open');
+  el.classList.toggle('open');
+  if (!wasOpen) el.querySelector('textarea').focus();
+}
+
+// ===== GOALS =====
+function renderGoals() {
+  document.getElementById('goals-list').innerHTML = state.goals.map((g,i) => `
+    <div class="flex gap-10 items-center mb-12" style="padding:10px 14px;background:var(--surface2);border-radius:10px">
+      <input type="checkbox" id="g${i}" style="accent-color:var(--accent);width:16px;height:16px;flex-shrink:0">
+      <label for="g${i}" style="font-size:14px;color:var(--text);flex:1;cursor:pointer">${g}</label>
+      <span onclick="removeGoal(${i})" style="cursor:pointer;color:var(--text3);font-size:16px">×</span>
+    </div>
+  `).join('');
+}
+
+function addGoal() {
+  const input = document.getElementById('new-goal');
+  if (input.value.trim()) {
+    state.goals.push(input.value.trim());
+    input.value = '';
+    renderGoals();
+  }
+}
+
+function removeGoal(i) {
+  state.goals.splice(i,1);
+  renderGoals();
+}
+
+// ===== TIMELINE =====
+function renderTimeline() {
+  const data = [
+    { date:'12 nov 2024', title:'Sesión 1 – Evaluación inicial', note:'Se aplica Rosenberg. Puntaje: 8/30. Identifica baja autoestima laboral y corporal.', score:8, scoreColor:'chip-red', filled:true },
+    { date:'26 nov 2024', title:'Sesión 2 – Exploración de creencias', note:'Trabaja pensamientos automáticos. Identifica: "No soy suficiente para mi cargo."', score:null, filled:true },
+    { date:'10 dic 2024', title:'Sesión 3 – Registro Rosenberg', note:'Puntaje: 12/30. Ligera mejora. Inicio de reestructuración cognitiva.', score:12, scoreColor:'chip-amber', filled:true },
+    { date:'14 ene 2025', title:'Sesión 4 – Autocompasión', note:'Introduce técnica del amigo compasivo. Muy movilizador. Llora en sesión.', score:null, filled:true },
+    { date:'28 ene 2025', title:'Sesión 5 – Valores e identidad', note:'Mapa de valores: autonomía, conexión, creatividad. Puntaje: 18/30.', score:18, scoreColor:'chip-amber', filled:true },
+    { date:'11 feb 2025', title:'Sesión 6 – Trabajo corporal', note:'Exploración de autoimagen. Narrativa crítica sobre el cuerpo. Tarea: registro de logros.', score:20, scoreColor:'chip-green', filled:true },
+    { date:'24 feb 2025', title:'Sesión 7 – Hoy', note:'Sesión actual. Puntaje previo: 22/30.', score:22, scoreColor:'chip-green', filled:false },
+  ];
+
+  document.getElementById('timeline').innerHTML = data.map(item => `
+    <div class="tl-item">
+      <div class="tl-dot ${item.filled?'filled':''}"></div>
+      <div class="tl-date">${item.date}</div>
+      <div class="tl-title">${item.title}</div>
+      <div class="tl-note">${item.note}</div>
+      ${item.score !== null ? `<span class="tl-score chip ${item.scoreColor}">Rosenberg: ${item.score}/30</span>` : ''}
+    </div>
+  `).join('');
+}
+
+// ===== PATIENT MODAL =====
+function openModal() {
+  document.getElementById('f-name').value = state.patient.name.split(' ')[0] || '';
+  document.getElementById('f-last').value = state.patient.name.split(' ')[1] || '';
+  document.getElementById('f-age').value = state.patient.age || '';
+  document.getElementById('f-session').value = state.patient.session || '';
+  document.getElementById('patient-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('patient-modal').classList.remove('open');
+}
+
+function savePatient() {
+  const name = (document.getElementById('f-name').value + ' ' + document.getElementById('f-last').value).trim();
+  const age = document.getElementById('f-age').value;
+  const session = document.getElementById('f-session').value;
+  state.patient = { name, age, session };
+  document.getElementById('sb-patient-name').textContent = name || 'Sin nombre';
+  document.getElementById('sb-patient-meta').textContent = `${age} años · Sesión #${session}`;
+  closeModal();
+}
+
+function toggleEmotionTag(el) {
+  el.classList.toggle('chip-blue');
+  el.classList.toggle('chip-green');
+}
+
+function saveNote() {
+  const note = document.getElementById('notes-session').value;
+  if (note.trim()) {
+    state.notes.push({ date: new Date().toLocaleDateString('es-ES'), text: note });
+    alert('Nota guardada correctamente.');
+  }
+}
+
+function newSession() {
+  if (confirm('¿Iniciar una nueva sesión? Se incrementará el contador de sesiones.')) {
+    state.patient.session = (parseInt(state.patient.session) || 0) + 1;
+    document.getElementById('sb-patient-meta').textContent = `${state.patient.age} años · Sesión #${state.patient.session}`;
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('patient-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
